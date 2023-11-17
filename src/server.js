@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 
 const UsersService = require('./services/UsersService');
@@ -6,11 +7,11 @@ const api = require('./adapter/api');
 
 const init = async () => {
   const usersService = new UsersService();
-  const apiMovies = api('http://localhost:3002');
+  const apiMovies = api(`http://${process.env.API_MOVIES}`);
 
   const server = Hapi.server({
-    port: '3001',
-    host: 'localhost',
+    host: process.env.HOST,
+    port: process.env.PORT,
     routes: {
       cors: {
         origin: ['*']
@@ -29,7 +30,7 @@ const init = async () => {
           status: 'success',
           data: users
         });
-        response.code(201);
+        response.code(200);
         return response;
       }
     },
@@ -44,10 +45,12 @@ const init = async () => {
       handler: async (requst, h) => {
         const { id } = requst.params;
         const users = await usersService.getUserById(id);
-        const { data: movie } = await apiMovies.get(`/${id}`);
+
+        const { movie: id_movie } = users[0];
+        const { data: movie } = await apiMovies.get(`/${id_movie}`);
 
         const mapped = users.map((user) => ({
-          username: user.username,
+          username: user.name,
           movie: movie.title
         }));
 
@@ -55,7 +58,7 @@ const init = async () => {
           status: 'success',
           data: mapped
         });
-        response.code(201);
+        response.code(200);
         return response;
       }
     },
