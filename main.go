@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
+	_ "os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -16,10 +18,12 @@ type Movie struct {
 
 func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
-	dbName := "cinema"
-	dbUser := "root"
-	dbPass := "my-secret-pw"
-	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp(localhost:3308)/"+dbName)
+	DB_NAME := os.Getenv("DB_NAME")
+	DB_USER := os.Getenv("DB_USER")
+	DB_PASS := os.Getenv("DB_PASS")
+	DB_HOST := os.Getenv("DB_HOST")
+	DB_PORT := os.Getenv("DB_PORT")
+	db, err := sql.Open(dbDriver, DB_USER+":"+DB_PASS+"@tcp("+DB_HOST+":"+DB_PORT+")/"+DB_NAME)
 
 	if err != nil {
 		panic(err.Error())
@@ -102,5 +106,7 @@ func main() {
 	router.GET("/:id", getMovieById)
 	router.POST("/", postMovie)
 
-	router.Run("localhost:3002")
+	HOST := os.Getenv("HOST")
+	PORT := os.Getenv("PORT")
+	router.Run(HOST + ":" + PORT)
 }
