@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const apiAdapter = require('./apiAdapter');
 
-const api = apiAdapter('http://localhost:3002');
+const api = apiAdapter(`http://${process.env.API_MOVIES}`);
 
 router.get('/', async (req, res) => {
   try {
@@ -11,6 +11,16 @@ router.get('/', async (req, res) => {
       status: 'success',
       data: movies.data
     });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const movies = await api.get(`/${id}`);
+    return res.json(movies.data);
   } catch (error) {
     console.log(error);
   }

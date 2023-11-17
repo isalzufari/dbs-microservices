@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const apiAdapter = require('./apiAdapter');
 
-const api = apiAdapter('http://localhost:3001');
+const api = apiAdapter(`http://${process.env.API_USERS}`);
 
 router.get('/', async (req, res) => {
   try {
